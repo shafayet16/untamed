@@ -196,10 +196,20 @@ export default function Home() {
       <div className="h-14 md:h-16"></div>
 
       {/* 2. HERO */}
-      <section className="relative w-full h-[65dvh] md:h-[80dvh] border-b border-[#52525b]/20 overflow-hidden bg-[#121212] flex items-center justify-center">
-        <div className="text-center z-10 px-4">
-          <h1 className="text-4xl md:text-6xl font-black uppercase tracking-widest text-white mb-6">NEW COLLECTION</h1>
-          <Link href="/shop" className="fade-in-up inline-block bg-transparent text-white border border-white hover:bg-white hover:text-black active:bg-[#d4d4d8] active:text-black active:scale-95 uppercase tracking-[0.25em] text-xs md:text-sm font-bold px-8 py-3 md:px-12 md:py-4 transition-all duration-300 hover:scale-105">
+      <section className="relative w-full h-[65dvh] md:h-[80dvh] border-b border-[#52525b]/25 overflow-hidden bg-[#0a0a0a] flex items-center justify-center">
+        <img 
+          src="/tuff.jpg" 
+          alt="Hero Collection" 
+          className="absolute inset-0 w-full h-full object-contain hero-fade-in"
+        />
+        {/* Horizontal dark gradient fade on left and right to expand the darkness without cropping height */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-transparent to-[#0a0a0a] opacity-90 pointer-events-none" />
+        {/* Subtle overall dark vignette overlay */}
+        <div className="absolute inset-0 bg-black/30 pointer-events-none" />
+        
+        {/* Shop Button */}
+        <div className="relative z-10 text-center px-4 mt-[45vh] md:mt-[55vh]">
+          <Link href="/shop" className="fade-in-up inline-block bg-transparent text-white border border-white hover:bg-white hover:text-black active:bg-[#d4d4d8] active:text-black active:scale-95 uppercase tracking-[0.25em] text-xs md:text-sm font-bold px-8 py-3 md:px-12 md:py-4 transition-all duration-300 hover:scale-105 shadow-2xl">
             shop
           </Link>
         </div>
@@ -213,15 +223,23 @@ export default function Home() {
           </h2>
           
           <div className="grid grid-cols-2 gap-4 md:gap-6 max-w-2xl mx-auto">
-            <Link href="/shop?category=tops" className="group cursor-pointer">
+            <Link href="/shop?category=gray-pants" className="group cursor-pointer">
               <div className="relative aspect-[3/4] overflow-hidden bg-[#18181b] border border-white/10 flex items-center justify-center">
-                <span className="text-xs uppercase font-mono tracking-widest text-zinc-500 group-hover:text-white transition-colors">TOPS</span>
+                <img 
+                  src="/graypant.png" 
+                  alt="Gray Pants" 
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
               </div>
             </Link>
 
-            <Link href="/shop?category=pants" className="group cursor-pointer">
+            <Link href="/shop?category=black-pants" className="group cursor-pointer">
               <div className="relative aspect-[3/4] overflow-hidden bg-[#18181b] border border-white/10 flex items-center justify-center">
-                <span className="text-xs uppercase font-mono tracking-widest text-zinc-500 group-hover:text-white transition-colors">PANTS</span>
+                <img 
+                  src="/blackpant.png" 
+                  alt="Black Pants" 
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
               </div>
             </Link>
           </div>
@@ -276,15 +294,6 @@ export default function Home() {
               })}
             </div>
           )}
-        </div>
-      </section>
-
-      {/* 6. UNTAMED BANNER SECTION */}
-      <section className="relative w-full bg-[#0a0a0a] py-16 md:py-24 border-b border-[#52525b]/20 overflow-hidden group">
-        <div className="relative z-10 text-center px-6">
-          <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black uppercase tracking-tighter text-white drop-shadow-2xl transition-all duration-500 group-hover:scale-105 active:scale-95">
-            UNTAMED
-          </h1>
         </div>
       </section>
 
