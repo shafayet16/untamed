@@ -5,12 +5,12 @@ import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
 import MobileMenu from './MobileMenu';
 
-// Direct Supabase client configuration
-const supabaseUrl = 'https://thkbnqmnatphefnnllme.supabase.co';
-const supabaseAnonKey = 'sb_publishable_4U7gn3gCQ3np5-Y9cD-sTQ_b0EWrYdC';
+// Supabase configuration driven by your environment variables
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-const R2_PUBLIC_URL = 'https://pub-fab4e79b5407486695278c53c8ded542.r2.dev';
+const R2_PUBLIC_URL = (process.env.NEXT_PUBLIC_R2_PUBLIC_URL || '').replace(/\/$/, '');
 
 type Product = {
   id: string;
@@ -23,33 +23,17 @@ type Product = {
   in_stock: boolean;
 };
 
-// Bulletproof Cloudflare R2 URL normalizer (strips legacy Supabase URLs/paths)
+// Cloudflare R2 URL normalizer
 const getProductImageUrl = (product: Product): string => {
   const rawImage = product.image || (product.images && product.images[0]);
-  if (!rawImage) return '/feralshirt1.png';
+  if (!rawImage) return '';
 
-  // If it's already a valid external R2 URL
-  if (rawImage.includes('r2.dev') || rawImage.startsWith('http://') || rawImage.startsWith('https://')) {
-    if (rawImage.includes('supabase.co')) {
-      // Extract filename/path from old Supabase URL
-      const parts = rawImage.split('product-images/');
-      if (parts.length > 1) {
-        const relativePath = parts[1].replace(/^\/+/, '');
-        if (relativePath.startsWith('products/')) {
-          return `${R2_PUBLIC_URL}/${relativePath}`;
-        }
-        return `${R2_PUBLIC_URL}/products/${relativePath}`;
-      }
-    } else if (!rawImage.includes('r2.dev')) {
-      return rawImage; // Return external non-supabase URL as-is
-    }
-  }
-
-  if (rawImage.includes('r2.dev')) {
+  // If already a full URL
+  if (rawImage.startsWith('http://') || rawImage.startsWith('https://')) {
     return rawImage;
   }
 
-  // Handle local or database paths containing product-images
+  // Handle paths
   let cleanPath = rawImage.replace(/^\/+/, '');
   if (cleanPath.startsWith('product-images/')) {
     cleanPath = cleanPath.replace('product-images/', '');
@@ -66,7 +50,6 @@ export default function Home() {
   const [scrolled, setScrolled] = useState(false);
   const [newDrops, setNewDrops] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [imageFailed, setImageFailed] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const handleScroll = () => {
@@ -76,14 +59,14 @@ export default function Home() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Fetch the 4 newest products from Supabase
+  // Fetch newest products directly from your Supabase database
   useEffect(() => {
     const fetchNewDrops = async () => {
       setLoading(true);
       const { data, error } = await supabase
         .from('products')
         .select('*')
-        .order('id', { ascending: false })
+        .order('created_at', { ascending: false })
         .limit(4);
 
       if (!error && data) {
@@ -96,19 +79,6 @@ export default function Home() {
 
     fetchNewDrops();
   }, []);
-
-  const handleImageError = (productId: string, e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    const imgElement = e.currentTarget;
-    if (!imageFailed[productId]) {
-      setImageFailed(prev => ({ ...prev, [productId]: true }));
-      const product = newDrops.find(p => p.id === productId);
-      const rawImage = product?.image || '';
-      const filename = rawImage.split('/').pop() || 'feralshirt1.png';
-      imgElement.src = `${R2_PUBLIC_URL}/products/${filename}`;
-    } else {
-      imgElement.src = '/feralshirt1.png';
-    }
-  };
 
   return (
     <div className="min-h-[100dvh] w-full bg-[#0a0a0a] text-[#f4f4f5] font-sans antialiased selection:bg-[#d4d4d8] selection:text-[#0a0a0a] overflow-x-hidden">
@@ -129,16 +99,10 @@ export default function Home() {
         .animate-marquee:active {
           animation-play-state: paused;
         }
-        .animate-marquee.slow {
-          animation-duration: 35s;
-        }
         
         @keyframes subtle-zoom {
           0% { transform: scale(1); }
           100% { transform: scale(1.05); }
-        }
-        .video-zoom {
-          animation: subtle-zoom 20s ease-in-out infinite alternate;
         }
 
         @keyframes fadeIn {
@@ -196,7 +160,7 @@ export default function Home() {
               <MobileMenu />
             </div>
             <div>
-              <img src="/ferallogu.png" alt="FERAL" className="h-16 w-auto object-contain" />
+              <span className="text-xl font-black tracking-tighter uppercase text-white">UNTAMED</span>
             </div>
             {/* Cart icon */}
             <div className="flex items-center gap-3 w-8 justify-end">
@@ -215,7 +179,7 @@ export default function Home() {
               <MobileMenu />
             </div>
             <div className="absolute left-1/2 transform -translate-x-1/2">
-              <img src="/ferallogu.png" alt="FERAL" className="h-20 w-auto object-contain" />
+              <span className="text-2xl font-black tracking-widest uppercase text-white">UNTAMED</span>
             </div>
             <div className="flex items-center gap-5">
               <Link href="/cart" className="relative text-[#d4d4d8] hover:text-[#f4f4f5] transition-all duration-300 hover:scale-110 active:scale-90">
@@ -232,13 +196,10 @@ export default function Home() {
       <div className="h-14 md:h-16"></div>
 
       {/* 2. HERO */}
-      <section className="relative w-full h-[65dvh] md:h-[80dvh] border-b border-[#52525b]/20 overflow-hidden">
-        <div className="absolute inset-0 z-0 hero-fade-in">
-          <img src="/bakkarputki.jpg" alt="FERAL Hero" className="w-full h-full object-cover transition-transform duration-700 hover:scale-105 active:scale-100" />
-          <div className="absolute inset-0 bg-black/40 transition-all duration-500 hover:bg-black/30 active:bg-black/50" />
-        </div>
-        <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2 z-10 w-full flex justify-center">
-          <Link href="/shop" className="fade-in-up bg-transparent text-white border border-white hover:bg-white hover:text-black active:bg-[#d4d4d8] active:text-black active:scale-95 uppercase tracking-[0.25em] text-xs md:text-sm font-bold px-8 py-3 md:px-12 md:py-4 transition-all duration-300 hover:scale-105 block">
+      <section className="relative w-full h-[65dvh] md:h-[80dvh] border-b border-[#52525b]/20 overflow-hidden bg-[#121212] flex items-center justify-center">
+        <div className="text-center z-10 px-4">
+          <h1 className="text-4xl md:text-6xl font-black uppercase tracking-widest text-white mb-6">NEW COLLECTION</h1>
+          <Link href="/shop" className="fade-in-up inline-block bg-transparent text-white border border-white hover:bg-white hover:text-black active:bg-[#d4d4d8] active:text-black active:scale-95 uppercase tracking-[0.25em] text-xs md:text-sm font-bold px-8 py-3 md:px-12 md:py-4 transition-all duration-300 hover:scale-105">
             shop
           </Link>
         </div>
@@ -253,54 +214,28 @@ export default function Home() {
           
           <div className="grid grid-cols-2 gap-4 md:gap-6 max-w-2xl mx-auto">
             <Link href="/shop?category=tops" className="group cursor-pointer">
-              <div className="relative aspect-[3/4] overflow-hidden bg-[#18181b]">
-                <img src="/yellowtop.webp" alt="Tops" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/20 transition-all duration-300" />
-              </div>
-              <div className="text-center mt-4">
-                <h3 className="text-sm md:text-base font-bold uppercase tracking-wider text-[#f4f4f5] group-hover:text-[#a1a1aa] transition-colors">TOPS</h3>
+              <div className="relative aspect-[3/4] overflow-hidden bg-[#18181b] border border-white/10 flex items-center justify-center">
+                <span className="text-xs uppercase font-mono tracking-widest text-zinc-500 group-hover:text-white transition-colors">TOPS</span>
               </div>
             </Link>
 
             <Link href="/shop?category=pants" className="group cursor-pointer">
-              <div className="relative aspect-[3/4] overflow-hidden bg-[#18181b]">
-                <img src="/ntnpantie.webp" alt="Pants" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/20 transition-all duration-300" />
-              </div>
-              <div className="text-center mt-4">
-                <h3 className="text-sm md:text-base font-bold uppercase tracking-wider text-[#f4f4f5] group-hover:text-[#a1a1aa] transition-colors">PANTS</h3>
+              <div className="relative aspect-[3/4] overflow-hidden bg-[#18181b] border border-white/10 flex items-center justify-center">
+                <span className="text-xs uppercase font-mono tracking-widest text-zinc-500 group-hover:text-white transition-colors">PANTS</span>
               </div>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* 4. KALAPLANE EDITORIAL PULL QUOTE */}
-      <section className="w-full bg-[#0a0a0a] py-16 md:py-24 border-b border-[#52525b]/20">
-        <div className="container mx-auto px-4 max-w-5xl">
-          <div className="flex flex-col items-center gap-8 md:gap-12">
-            <div className="w-full">
-              <div className="relative aspect-[4/3] md:aspect-[16/9] overflow-hidden bg-[#18181b]">
-                <video src="/feralquote.mp4" autoPlay loop muted playsInline className="w-full h-full object-cover" />
-              </div>
-            </div>
-            <div className="text-center w-full pt-4">
-              <Link href="/shop" className="inline-block text-sm uppercase tracking-widest border-b border-[#52525b] pb-2 hover:border-white transition-colors">
-                VIEW ALL
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 5. NEW DROPS HEADER */}
+      {/* 4. NEW DROPS HEADER */}
       <section className="w-full bg-[#0a0a0a] text-center py-10 md:py-14">
-        <h2 className="text-sm md:text-base font-black tracking-[0.3em] uppercase text-[#f4f4f5] transition-all duration-300 hover:tracking-[0.4em] active:tracking-[0.2em]">
+        <h2 className="text-sm md:text-base font-black tracking-[0.3em] uppercase text-[#f4f4f5]">
           NEW DROPS
         </h2>
       </section>
 
-      {/* 6. DYNAMIC NEW DROPS GRID */}
+      {/* 5. DYNAMIC NEW DROPS GRID */}
       <section className="w-full bg-[#0a0a0a] pb-12 md:pb-16 border-b border-[#52525b]/20 overflow-hidden">
         <div className="container mx-auto px-4">
           {loading ? (
@@ -308,8 +243,8 @@ export default function Home() {
               <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
             </div>
           ) : newDrops.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-xs text-[#a1a1aa] uppercase font-mono tracking-widest">No recent drops discovered.</p>
+            <div className="text-center py-16 border border-dashed border-white/10 max-w-xl mx-auto rounded-lg">
+              <p className="text-xs text-[#a1a1aa] uppercase font-mono tracking-widest">No products available yet.</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
@@ -317,13 +252,16 @@ export default function Home() {
                 const imageUrl = getProductImageUrl(product);
                 return (
                   <Link key={product.id} href={`/product/${product.id}`} className="group cursor-pointer block">
-                    <div className="relative aspect-[3/4] overflow-hidden bg-[#18181b]">
-                      <img 
-                        src={imageUrl} 
-                        alt={product.name} 
-                        onError={(e) => handleImageError(product.id, e)}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
-                      />
+                    <div className="relative aspect-[3/4] overflow-hidden bg-[#18181b] border border-white/5">
+                      {imageUrl ? (
+                        <img 
+                          src={imageUrl} 
+                          alt={product.name} 
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-zinc-700 text-xs font-mono">NO IMAGE</div>
+                      )}
                     </div>
                     <div className="mt-4 text-center">
                       <h3 className="text-xs md:text-sm font-medium uppercase tracking-wide text-[#f4f4f5] group-hover:text-[#a1a1aa] transition-colors truncate px-1">
@@ -341,13 +279,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 7. UNTAMED VIDEO SECTION */}
+      {/* 6. UNTAMED BANNER SECTION */}
       <section className="relative w-full bg-[#0a0a0a] py-16 md:py-24 border-b border-[#52525b]/20 overflow-hidden group">
-        <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-black/50 transition-all duration-500 group-hover:bg-black/40 group-active:bg-black/60" />
-        </div>
         <div className="relative z-10 text-center px-6">
-          <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black uppercase tracking-tighter text-white drop-shadow-2xl transition-all duration-500 group-hover:tracking-tight group-hover:scale-105 active:scale-95">
+          <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black uppercase tracking-tighter text-white drop-shadow-2xl transition-all duration-500 group-hover:scale-105 active:scale-95">
             UNTAMED
           </h1>
         </div>
@@ -362,10 +297,10 @@ export default function Home() {
         </div>
         <div className="w-[90%] max-w-5xl h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent mb-10" />
         
-        {/* CENTERED INSTAGRAM ICON ONLY */}
+        {/* CENTERED INSTAGRAM ICON */}
         <div className="flex justify-center mb-8">
           <a 
-            href="https://instagram.com/feral.untamed" 
+            href="https://instagram.com" 
             target="_blank" 
             rel="noopener noreferrer" 
             className="w-12 h-12 flex items-center justify-center text-[#a1a1aa] hover:text-[#f4f4f5] hover:bg-[#52525b]/20 rounded-full transition-all duration-300 hover:-translate-y-1 active:scale-95" 
@@ -378,7 +313,7 @@ export default function Home() {
         </div>
 
         <div className="leading-relaxed text-[10px] md:text-xs tracking-[0.25em] text-[#52525b] uppercase space-y-2">
-          <p className="font-bold text-[#71717a] transition-all duration-300 hover:text-[#a1a1aa] active:text-white">© 2026 FERAL. All rights reserved.</p>
+          <p className="font-bold text-[#71717a] transition-all duration-300 hover:text-[#a1a1aa] active:text-white">© 2026 UNTAMED. All rights reserved.</p>
           <p className="text-[9px] font-mono lowercase tracking-normal text-[#52525b]/70 transition-all duration-300 hover:text-[#71717a] active:text-white">made by shafbitz</p>
         </div>
       </footer>
