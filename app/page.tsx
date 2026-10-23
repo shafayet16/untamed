@@ -145,6 +145,13 @@ export default function Home() {
         .navbar-shimmer {
           animation: shimmer 3s ease-in-out infinite;
         }
+
+        /* Seamless edge gradient mask for wide hero display without cropping center graphic */
+        .hero-edge-blend {
+          background: #0a0a0a;
+          mask-image: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 25%, rgba(0,0,0,1) 75%, rgba(0,0,0,0) 100%);
+          -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 25%, rgba(0,0,0,1) 75%, rgba(0,0,0,0) 100%);
+        }
       `}} />
 
       {/* 1. HEADER */}
@@ -158,9 +165,6 @@ export default function Home() {
           <div className="flex items-center justify-between md:hidden">
             <div className="w-8">
               <MobileMenu />
-            </div>
-            <div>
-              <span className="text-xl font-black tracking-tighter uppercase text-white">UNTAMED</span>
             </div>
             {/* Cart icon */}
             <div className="flex items-center gap-3 w-8 justify-end">
@@ -178,9 +182,6 @@ export default function Home() {
             <div className="flex items-center gap-6">
               <MobileMenu />
             </div>
-            <div className="absolute left-1/2 transform -translate-x-1/2">
-              <span className="text-2xl font-black tracking-widest uppercase text-white">UNTAMED</span>
-            </div>
             <div className="flex items-center gap-5">
               <Link href="/cart" className="relative text-[#d4d4d8] hover:text-[#f4f4f5] transition-all duration-300 hover:scale-110 active:scale-90">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -197,18 +198,22 @@ export default function Home() {
 
       {/* 2. HERO */}
       <section className="relative w-full h-[65dvh] md:h-[80dvh] border-b border-[#52525b]/25 overflow-hidden bg-[#0a0a0a] flex items-center justify-center">
-        <img 
-          src="/tuff.jpg" 
-          alt="Hero Collection" 
-          className="absolute inset-0 w-full h-full object-contain hero-fade-in"
-        />
-        {/* Horizontal dark gradient fade on left and right to expand the darkness without cropping height */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-transparent to-[#0a0a0a] opacity-90 pointer-events-none" />
-        {/* Subtle overall dark vignette overlay */}
-        <div className="absolute inset-0 bg-black/30 pointer-events-none" />
+        {/* Expanded background blur clone to fill width seamlessly */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-30 filter blur-2xl pointer-events-none scale-125">
+          <img src="/tuff.jpg" alt="" className="w-full h-full object-cover" />
+        </div>
+
+        {/* Main uncropped image centered with smooth edge gradient fade */}
+        <div className="relative h-full w-full max-w-5xl flex items-center justify-center hero-edge-blend">
+          <img 
+            src="/tuff.jpg" 
+            alt="Hero Collection" 
+            className="h-full w-auto object-contain hero-fade-in"
+          />
+        </div>
         
         {/* Shop Button */}
-        <div className="relative z-10 text-center px-4 mt-[45vh] md:mt-[55vh]">
+        <div className="absolute z-20 text-center px-4 bottom-12 md:bottom-16 left-1/2 transform -translate-x-1/2">
           <Link href="/shop" className="fade-in-up inline-block bg-transparent text-white border border-white hover:bg-white hover:text-black active:bg-[#d4d4d8] active:text-black active:scale-95 uppercase tracking-[0.25em] text-xs md:text-sm font-bold px-8 py-3 md:px-12 md:py-4 transition-all duration-300 hover:scale-105 shadow-2xl">
             shop
           </Link>

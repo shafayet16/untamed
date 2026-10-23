@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Feral",
-  description: "Untamed",
+  title: "Untamed",
+  description: "",
 };
 
 export default function RootLayout({
