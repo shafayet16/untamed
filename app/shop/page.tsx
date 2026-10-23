@@ -152,7 +152,7 @@ function ShopContent() {
               <MobileMenu />
             </div>
             <div>
-              <img src="/ferallogu.png" alt="FERAL" className="h-16 w-auto object-contain" />
+              <img src="/untamedlogo.png" alt="FERAL" className="h-16 w-auto object-contain" />
             </div>
             <div className="flex items-center gap-3 w-8 justify-end">
               <Link
@@ -177,7 +177,7 @@ function ShopContent() {
               <MobileMenu />
             </div>
             <div className="absolute left-1/2 transform -translate-x-1/2">
-              <img src="/ferallogu.png" alt="FERAL" className="h-20 w-auto object-contain" />
+              <img src="/untamedlogo.png" alt="UNTAMED" className="h-8 w-auto object-contain" />
             </div>
             <div className="flex items-center gap-5">
               <Link

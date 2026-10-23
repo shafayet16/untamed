@@ -86,15 +86,6 @@ export default function MobileMenu() {
                 </li>
                 <li>
                   <Link 
-                    href="/shop?category=bestsellers" 
-                    onClick={() => setIsOpen(false)} 
-                    className="text-sm md:text-base uppercase text-[#d4d4d8] hover:text-[#f4f4f5] transition duration-200"
-                  >
-                    Bestsellers
-                  </Link>
-                </li>
-                <li>
-                  <Link 
                     href="/" 
                     onClick={() => setIsOpen(false)} 
                     className="text-sm md:text-base uppercase text-[#d4d4d8] hover:text-[#f4f4f5] transition duration-200"

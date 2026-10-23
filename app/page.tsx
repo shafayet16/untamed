@@ -146,7 +146,6 @@ export default function Home() {
           animation: shimmer 3s ease-in-out infinite;
         }
 
-        /* Seamless edge gradient mask for wide hero display without cropping center graphic */
         .hero-edge-blend {
           background: #0a0a0a;
           mask-image: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 25%, rgba(0,0,0,1) 75%, rgba(0,0,0,0) 100%);
@@ -166,6 +165,11 @@ export default function Home() {
             <div className="w-8">
               <MobileMenu />
             </div>
+            <div className="flex items-center justify-center">
+              <Link href="/">
+                <img src="/untamedlogo.png" alt="UNTAMED" className="h-6 w-auto object-contain mix-blend-screen" />
+              </Link>
+            </div>
             {/* Cart icon */}
             <div className="flex items-center gap-3 w-8 justify-end">
               <Link href="/cart" className="relative text-[#d4d4d8] hover:text-[#f4f4f5] transition-all duration-300 hover:scale-110 active:scale-90">
@@ -182,6 +186,11 @@ export default function Home() {
             <div className="flex items-center gap-6">
               <MobileMenu />
             </div>
+            <div className="absolute left-1/2 transform -translate-x-1/2">
+              <Link href="/">
+                <img src="/untamedlogo.png" alt="UNTAMED" className="h-8 w-auto object-contain mix-blend-screen" />
+              </Link>
+            </div>
             <div className="flex items-center gap-5">
               <Link href="/cart" className="relative text-[#d4d4d8] hover:text-[#f4f4f5] transition-all duration-300 hover:scale-110 active:scale-90">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -197,13 +206,11 @@ export default function Home() {
       <div className="h-14 md:h-16"></div>
 
       {/* 2. HERO */}
-      <section className="relative w-full h-[65dvh] md:h-[80dvh] border-b border-[#52525b]/25 overflow-hidden bg-[#0a0a0a] flex items-center justify-center">
-        {/* Expanded background blur clone to fill width seamlessly */}
+      <section className="relative w-full h-[65dvh] md:h-[80dvh] border-b border-[#52525b]/25 overflow-hidden bg-[#0a0a0a] flex items-center justify-center m-0 p-0">
         <div className="absolute inset-0 flex items-center justify-center opacity-30 filter blur-2xl pointer-events-none scale-125">
           <img src="/tuff.jpg" alt="" className="w-full h-full object-cover" />
         </div>
 
-        {/* Main uncropped image centered with smooth edge gradient fade */}
         <div className="relative h-full w-full max-w-5xl flex items-center justify-center hero-edge-blend">
           <img 
             src="/tuff.jpg" 
