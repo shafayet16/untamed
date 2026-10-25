@@ -4,8 +4,9 @@ import { useState, useEffect, Suspense, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://thkbnqmnatphefnnllme.supabase.co';
-const supabaseAnonKey = 'sb_publishable_4U7gn3gCQ3np5-Y9cD-sTQ_b0EWrYdC';
+// Dynamically pull from your .env.local file
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Robust error message extractor
@@ -199,8 +200,8 @@ function EditProductForm() {
     const updateData = {
       name,
       price: parseFloat(price) || 0,
-      categories: categories,                 // store array
-      category: categories[0] || '',          // keep legacy for filters
+      categories: categories,                 
+      category: categories[0] || '',          
       description,
       details,
       in_stock: inStock,

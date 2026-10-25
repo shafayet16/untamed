@@ -4,8 +4,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://thkbnqmnatphefnnllme.supabase.co';
-const supabaseAnonKey = 'sb_publishable_4U7gn3gCQ3np5-Y9cD-sTQ_b0EWrYdC';
+// Dynamically pull from your .env.local file
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export default function AddProduct() {
@@ -14,7 +15,7 @@ export default function AddProduct() {
   const [error, setError] = useState<string | null>(null);
   const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
 
-  // Core Fields Data Form State Mapping
+  // Form Fields
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [category, setCategory] = useState('tops');
@@ -23,7 +24,6 @@ export default function AddProduct() {
   const [inStock, setInStock] = useState(true);
   const [isBestseller, setIsBestseller] = useState(false);
   
-  // Clean initialization slots targeting 5 items array
   const [images, setImages] = useState<string[]>(['', '', '', '', '']);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
@@ -32,7 +32,6 @@ export default function AddProduct() {
     setUploadingIndex(index);
 
     try {
-      // 1. Get presigned upload URL from Cloudflare R2 endpoint
       const res = await fetch('/api/upload', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -45,7 +44,6 @@ export default function AddProduct() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to generate upload link.');
 
-      // 2. Upload file directly to Cloudflare R2 bucket
       const uploadRes = await fetch(data.uploadUrl, {
         method: 'PUT',
         headers: { 'Content-Type': file.type },
@@ -54,7 +52,6 @@ export default function AddProduct() {
 
       if (!uploadRes.ok) throw new Error('Direct upload to Cloudflare R2 failed.');
 
-      // 3. Update state with R2 public CDN URL
       const updated = [...images];
       updated[index] = data.publicUrl;
       setImages(updated);
@@ -74,7 +71,7 @@ export default function AddProduct() {
     const finalImagesArray = images.filter((url) => url.trim() !== '');
 
     if (!name || !price) {
-      setError('Core identifier parameters Name and Price must be assigned values.');
+      setError('Name and Price are required.');
       setLoading(false);
       return;
     }
@@ -102,8 +99,8 @@ export default function AddProduct() {
       router.push('/admin/products');
       router.refresh();
     } catch (err: any) {
-      console.error('Error adding record item metadata profile:', err);
-      setError(err.message || 'Failed creating new catalog resource profile target.');
+      console.error('Error inserting product:', err);
+      setError(err.message || 'Failed creating new product.');
     } finally {
       setLoading(false);
     }
