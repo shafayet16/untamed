@@ -8,8 +8,9 @@ import { createClient } from '@supabase/supabase-js';
 import { useCartStore } from '@/app/store/cartStore';
 import MobileMenu from '../../MobileMenu';
 
-const supabaseUrl = 'https://thkbnqmnatphefnnllme.supabase.co';
-const supabaseAnonKey = 'sb_publishable_4U7gn3gCQ3np5-Y9cD-sTQ_b0EWrYdC';
+// Dynamically pull from your .env.local file
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Size sorting helper for proper order
