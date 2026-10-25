@@ -29,7 +29,7 @@ export default function AdminNav() {
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-6">
           <span className="text-sm font-bold uppercase tracking-[0.2em] text-white mr-4">
-            FERAL ADMIN
+            UNTAMED ADMIN
           </span>
           <button onClick={() => router.push('/admin/dashboard')} className={linkClass('/admin/dashboard')}>
             Orders
