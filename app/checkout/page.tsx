@@ -313,7 +313,9 @@ export default function CheckoutPage() {
               <MobileMenu />
             </div>
             <div>
-              <img src="/ferallogu.png" alt="FERAL" className="h-12 w-auto" />
+              <Link href="/">
+                <img src="/untamedlogo.png" alt="UNTAMED" className="h-6 w-auto object-contain mix-blend-screen" />
+              </Link>
             </div>
             <Link href="/cart" className="text-[#d4d4d8] hover:text-white">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -325,8 +327,10 @@ export default function CheckoutPage() {
             <div className="flex items-center gap-6">
               <MobileMenu />
             </div>
-            <div>
-              <img src="/ferallogu.png" alt="FERAL" className="h-16 w-auto" />
+            <div className="absolute left-1/2 transform -translate-x-1/2">
+              <Link href="/">
+                <img src="/untamedlogo.png" alt="UNTAMED" className="h-8 w-auto object-contain mix-blend-screen" />
+              </Link>
             </div>
             <Link href="/cart" className="text-[#d4d4d8] hover:text-white">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -717,10 +721,7 @@ export default function CheckoutPage() {
       {/* FOOTER */}
       <footer className="pt-12 pb-14 text-center border-t border-[#52525b]/20">
         <div className="text-[10px] tracking-[0.25em] text-[#52525b] uppercase">
-          © 2026 FERAL. All rights reserved.
-        </div>
-        <div className="text-[9px] font-mono lowercase tracking-normal text-[#52525b]/70 mt-2">
-          made by shafbitz
+          © 2026 UNTAMED. All rights reserved.
         </div>
       </footer>
     </div>

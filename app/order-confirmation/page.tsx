@@ -41,27 +41,54 @@ export default function OrderConfirmationPage() {
     <div className="min-h-screen w-full bg-[#0a0a0a] text-[#f4f4f5] overflow-x-hidden">
       
       {/* HEADER */}
-      <header className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-500 ${
-        scrolled ? 'bg-[#0a0a0a]/95 backdrop-blur-md border-b border-white/20' : 'bg-[#0a0a0a]/80 backdrop-blur-sm border-b border-[#52525b]/20'
-      }`}>
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-500 ease-out ${
+          scrolled
+            ? 'bg-[#0a0a0a]/95 backdrop-blur-md border-b border-white/20 shadow-[0_0_30px_rgba(255,255,255,0.1)]'
+            : 'bg-[#0a0a0a]/80 backdrop-blur-sm border-b border-[#52525b]/20'
+        }`}
+      >
         <div className="px-4 py-2 md:py-3 md:px-8">
           <div className="flex items-center justify-between md:hidden">
-            <div className="w-8"><MobileMenu /></div>
-            <div><img src="/ferallogu.png" alt="FERAL" className="h-12 w-auto" /></div>
-            <Link href="/cart" className="text-[#d4d4d8] hover:text-white">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1.5 6M17 13l1.5 6M9 21h6" />
-              </svg>
-            </Link>
+            <div className="w-8">
+              <MobileMenu />
+            </div>
+            <div>
+              <Link href="/">
+                <img src="/untamedlogo.png" alt="UNTAMED" className="h-6 w-auto object-contain mix-blend-screen" />
+              </Link>
+            </div>
+            <div className="flex items-center gap-3 w-8 justify-end">
+              <Link
+                href="/cart"
+                className="text-[#d4d4d8] hover:text-[#f4f4f5] transition-all duration-300 hover:scale-110 active:scale-90"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1.5 6M17 13l1.5 6M9 21h6" />
+                </svg>
+              </Link>
+            </div>
           </div>
+
           <div className="hidden md:flex items-center justify-between">
-            <div className="flex items-center gap-6"><MobileMenu /></div>
-            <div><img src="/ferallogu.png" alt="FERAL" className="h-16 w-auto" /></div>
-            <Link href="/cart" className="text-[#d4d4d8] hover:text-white">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1.5 6M17 13l1.5 6M9 21h6" />
-              </svg>
-            </Link>
+            <div className="flex items-center gap-6">
+              <MobileMenu />
+            </div>
+            <div className="absolute left-1/2 transform -translate-x-1/2">
+              <Link href="/">
+                <img src="/untamedlogo.png" alt="UNTAMED" className="h-8 w-auto object-contain mix-blend-screen" />
+              </Link>
+            </div>
+            <div className="flex items-center gap-5">
+              <Link
+                href="/cart"
+                className="relative text-[#d4d4d8] hover:text-[#f4f4f5] transition-all duration-300 hover:scale-110 active:scale-90"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1.5 6M17 13l1.5 6M9 21h6" />
+                </svg>
+              </Link>
+            </div>
           </div>
         </div>
       </header>
@@ -114,7 +141,7 @@ export default function OrderConfirmationPage() {
 
       {/* FOOTER */}
       <footer className="pt-12 pb-14 text-center border-t border-[#52525b]/20">
-        <div className="text-[10px] tracking-[0.25em] text-[#52525b] uppercase">© 2026 FERAL. All rights reserved.</div>
+        <div className="text-[10px] tracking-[0.25em] text-[#52525b] uppercase">© 2026 UNTAMED. All rights reserved.</div>
         <div className="text-[9px] font-mono lowercase tracking-normal text-[#52525b]/70 mt-2">made by shafbitz</div>
       </footer>
     </div>

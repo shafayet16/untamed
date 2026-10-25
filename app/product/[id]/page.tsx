@@ -407,7 +407,9 @@ export default function ProductPage() {
               <MobileMenu />
             </div>
             <div>
-              <img src="/ferallogu.png" alt="FERAL" className="h-16 w-auto object-contain" />
+              <Link href="/">
+                <img src="/untamedlogo.png" alt="UNTAMED" className="h-6 w-auto object-contain mix-blend-screen" />
+              </Link>
             </div>
             <div className="flex items-center gap-3 w-8 justify-end">
               <Link
@@ -426,7 +428,9 @@ export default function ProductPage() {
               <MobileMenu />
             </div>
             <div className="absolute left-1/2 transform -translate-x-1/2">
-              <img src="/ferallogu.png" alt="FERAL" className="h-20 w-auto object-contain" />
+              <Link href="/">
+                <img src="/untamedlogo.png" alt="UNTAMED" className="h-8 w-auto object-contain mix-blend-screen" />
+              </Link>
             </div>
             <div className="flex items-center gap-5">
               <Link
@@ -750,7 +754,7 @@ export default function ProductPage() {
         </div>
 
         <div className="leading-relaxed text-[10px] md:text-xs tracking-[0.25em] text-[#52525b] uppercase space-y-2">
-          <p className="font-bold text-[#71717a]">© 2026 FERAL. All rights reserved.</p>
+          <p className="font-bold text-[#71717a]">© 2026 UNTAMED. All rights reserved.</p>
           <p className="text-[9px] font-mono lowercase tracking-normal text-[#52525b]/70">made by shafbitz</p>
         </div>
       </footer>

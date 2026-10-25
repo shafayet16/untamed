@@ -83,7 +83,7 @@ async function processCheckout(body: any, sessionId: string) {
   const { data: order, error: orderError } = await supabaseAdmin
     .from('orders')
     .insert({
-      order_number: `FERAL-${Date.now().toString().slice(-6)}`,
+      order_number: `UNTAMED-${Date.now().toString().slice(-6)}`,
       customer_name: fullName,
       customer_email: email,
       customer_phone: phone,
