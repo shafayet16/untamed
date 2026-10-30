@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 
@@ -18,7 +19,7 @@ export default function AdminNav() {
   };
 
   const linkClass = (href: string) =>
-    `text-xs uppercase tracking-wider px-3 py-2 transition ${
+    `text-xs uppercase tracking-wider px-3 py-2 transition inline-block ${
       pathname === href
         ? 'text-white border-b border-white'
         : 'text-neutral-400 hover:text-white'
@@ -31,12 +32,12 @@ export default function AdminNav() {
           <span className="text-sm font-bold uppercase tracking-[0.2em] text-white mr-4">
             UNTAMED ADMIN
           </span>
-          <button onClick={() => router.push('/admin/dashboard')} className={linkClass('/admin/dashboard')}>
+          <Link href="/admin/dashboard" className={linkClass('/admin/dashboard')}>
             Orders
-          </button>
-          <button onClick={() => router.push('/admin/products')} className={linkClass('/admin/products')}>
+          </Link>
+          <Link href="/admin/products" className={linkClass('/admin/products')}>
             Products
-          </button>
+          </Link>
         </div>
         <button
           onClick={handleLogout}
