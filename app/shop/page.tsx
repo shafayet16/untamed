@@ -122,18 +122,18 @@ function ShopContent() {
     { id: 'pants', name: 'PANTS' },
   ];
 
+  // FIX: Robust case-insensitive and hyphen-tolerant category matching
   const filteredProducts = products.filter(product => {
     if (activeCategory === 'all') return true;
-    return (
-      product.categories?.includes(activeCategory) ||
-      product.category?.toLowerCase() === activeCategory
-    );
+    
+    const target = activeCategory.replace(/-/g, ' ');
+    const dbCategory = (product.category || '').toLowerCase();
+    
+    const matchesSingle = dbCategory.includes(target) || target.includes(dbCategory);
+    const matchesArray = product.categories?.some(c => c.toLowerCase().includes(target));
+
+    return matchesSingle || matchesArray;
   });
-
-  const VISIBLE_COUNT = 8;
-  const visibleProducts = filteredProducts.slice(0, VISIBLE_COUNT);
-
-  const showLoadMoreButton = filteredProducts.length > VISIBLE_COUNT || (dbHasMore && filteredProducts.length >= VISIBLE_COUNT);
 
   return (
     <div className="min-h-screen w-full bg-[#0a0a0a] text-[#f4f4f5] font-sans antialiased overflow-x-hidden">
@@ -231,18 +231,18 @@ function ShopContent() {
       {/* PRODUCT GRID */}
       <section className="w-full bg-[#0a0a0a] py-12 md:py-16">
         <div className="container mx-auto px-4">
-          {loading && visibleProducts.length === 0 ? (
+          {loading && filteredProducts.length === 0 ? (
             <div className="flex justify-center items-center py-20">
               <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
             </div>
-          ) : visibleProducts.length === 0 ? (
+          ) : filteredProducts.length === 0 ? (
             <div className="text-center py-20">
               <p className="text-[#a1a1aa]">No products found in this category.</p>
             </div>
           ) : (
             <>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-                {visibleProducts.map(product => (
+                {filteredProducts.map(product => (
                   <Link
                     key={product.id}
                     href={`/product/${product.id}`}
@@ -272,14 +272,10 @@ function ShopContent() {
                 ))}
               </div>
 
-              {showLoadMoreButton && (
+              {dbHasMore && (
                 <div className="text-center mt-10">
                   <button
-                    onClick={() => {
-                      if (filteredProducts.length <= VISIBLE_COUNT && dbHasMore) {
-                        setPage(prev => prev + 1);
-                      }
-                    }}
+                    onClick={() => setPage(prev => prev + 1)}
                     className="border border-[#52525b]/50 text-[#f4f4f5] px-8 py-3 text-xs uppercase tracking-wider hover:border-white transition"
                   >
                     {loading ? 'Loading...' : 'Load More'}
