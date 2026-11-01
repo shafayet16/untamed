@@ -7,6 +7,7 @@ import { motion, Variants, useMotionValue, animate } from 'framer-motion';
 import { createClient } from '@supabase/supabase-js';
 import { useCartStore } from '@/app/store/cartStore';
 import MobileMenu from '../../MobileMenu';
+import { fbEvent } from '@/lib/fbpixel'; // <-- 1. Import Meta Pixel helper
 
 // Dynamically pull from your .env.local file
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
@@ -85,6 +86,19 @@ export default function ProductPage() {
   const productId = params?.id ? String(params.id) : '';
   const addItem = useCartStore((state) => state.addItem);
 
+  // 2. Fire ViewContent when product data is successfully loaded
+  useEffect(() => {
+    if (product) {
+      fbEvent('ViewContent', {
+        content_ids: [product.id],
+        content_name: product.name,
+        content_type: 'product',
+        value: Number(product.price),
+        currency: 'BDT',
+      });
+    }
+  }, [product]);
+
   // Measure carousel width safely
   useEffect(() => {
     const measure = () => {
@@ -158,7 +172,6 @@ export default function ProductPage() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product, selectedImage]);
 
   // Trackpad horizontal swipe
@@ -186,7 +199,6 @@ export default function ProductPage() {
       node.removeEventListener('wheel', handleWheel);
       cancelAnimationFrame(rafId);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product, selectedImage]);
 
   useEffect(() => {
@@ -207,7 +219,6 @@ export default function ProductPage() {
 
         if (productError || !fetchedProduct) throw productError || new Error('Product not found');
 
-        // SAFE IMAGE SANITIZATION
         const rawGallery = Array.isArray(fetchedProduct.images) && fetchedProduct.images.length > 0
           ? fetchedProduct.images
           : [(fetchedProduct as any).image || '/feralshirt1.png'];
@@ -218,7 +229,6 @@ export default function ProductPage() {
 
         const explicitGallery = sanitizedGallery.length > 0 ? sanitizedGallery : ['/feralshirt1.png'];
 
-        // PARSE SIZE QUANTITIES
         let sizeQuantities: Record<string, number> = {};
         try {
           if (typeof fetchedProduct.size_quantities === 'string') {
@@ -230,8 +240,6 @@ export default function ProductPage() {
           sizeQuantities = {};
         }
 
-        // STRICT DYNAMIC SIZES DERIVATION
-        // If size_quantities object exists, use its keys strictly. Otherwise fall back to sizes column.
         let rawSizes: string[] = [];
         const sqKeys = Object.keys(sizeQuantities);
 
@@ -266,7 +274,6 @@ export default function ProductPage() {
           setSelectedSize(firstAvailable || mappedProduct.sizes[0]);
         }
 
-        // Fetch Related Products
         const { data: related } = await supabase
           .from('products')
           .select('id, name, price, description, details, model_info, sizes, images, category, is_bestseller, in_stock, stock_count, size_quantities')
@@ -364,7 +371,19 @@ export default function ProductPage() {
       alert('This size is currently unavailable');
       return;
     }
+    
     await addItem(Number(product.id), quantity, selectedSize);
+
+    // 3. Fire AddToCart event to Meta Pixel
+    fbEvent('AddToCart', {
+      content_ids: [product.id],
+      content_name: product.name,
+      content_type: 'product',
+      contents: [{ id: product.id, quantity: quantity }],
+      value: Number(product.price) * quantity,
+      currency: 'BDT',
+    });
+
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 2000);
   };
@@ -379,6 +398,17 @@ export default function ProductPage() {
       alert('This size is currently unavailable');
       return;
     }
+
+    // Fire AddToCart as well on Buy Now since it proceeds through checkout
+    fbEvent('AddToCart', {
+      content_ids: [product.id],
+      content_name: product.name,
+      content_type: 'product',
+      contents: [{ id: product.id, quantity: quantity }],
+      value: Number(product.price) * quantity,
+      currency: 'BDT',
+    });
+
     const checkoutItem = {
       id: product.id,
       name: product.name,
@@ -748,14 +778,14 @@ export default function ProductPage() {
             aria-label="Instagram"
           >
             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zM12 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0 3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zM12 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
             </svg>
           </a>
         </div>
 
         <div className="leading-relaxed text-[10px] md:text-xs tracking-[0.25em] text-[#52525b] uppercase space-y-2">
-          <p className="font-bold text-[#71717a]">© 2026 UNTAMED. All rights reserved.</p>
-          <p className="text-[9px] font-mono lowercase tracking-normal text-[#52525b]/70">made by shafbitz</p>
+          <p className="font-bold text-[#71717a] transition-all duration-300 hover:text-[#a1a1aa] active:text-white">© 2026 UNTAMED. All rights reserved.</p>
+          <p className="text-[9px] font-mono lowercase tracking-normal text-[#52525b]/70 transition-all duration-300 hover:text-[#71717a] active:text-white">made by shafbitz</p>
         </div>
       </footer>
     </div>

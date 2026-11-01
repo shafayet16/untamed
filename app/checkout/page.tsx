@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import MobileMenu from '../MobileMenu';
 import { useCartStore } from '@/app/store/cartStore';
+import { fbEvent } from '@/lib/fbpixel'; // <-- 1. Import Meta Pixel helper
 
 const R2_PUBLIC_URL = (
   process.env.NEXT_PUBLIC_R2_PUBLIC_URL || 'https://pub-fab4e79b5407486695278c53c8ded542.r2.dev'
@@ -196,6 +197,19 @@ export default function CheckoutPage() {
   const shippingCost = formData.city ? (formData.city === 'Dhaka' ? 80 : 130) : null;
   const orderTotal = shippingCost !== null ? subtotal + shippingCost : null;
 
+  // 2. Fire InitiateCheckout when checkout items & total are loaded
+  useEffect(() => {
+    if (checkoutItems.length > 0 && orderTotal !== null) {
+      fbEvent('InitiateCheckout', {
+        content_ids: checkoutItems.map(i => i.product_id || i.id),
+        contents: checkoutItems.map(i => ({ id: i.product_id || i.id, quantity: i.quantity })),
+        num_items: checkoutItems.reduce((n, i) => n + i.quantity, 0),
+        value: Number(orderTotal),
+        currency: 'BDT',
+      });
+    }
+  }, [checkoutItems, orderTotal]);
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -256,7 +270,7 @@ export default function CheckoutPage() {
       total: orderTotal,
       transactionId: transactionId || null,
       items: checkoutItems.map(item => ({
-        product_id: item.product_id,
+        product_id: item.product_id || item.id,
         name: item.name ?? item.products?.name ?? 'Feral Item',
         price: item.price ?? item.products?.price ?? 0,
         quantity: item.quantity,
