@@ -7,7 +7,7 @@ import { motion, Variants, useMotionValue, animate } from 'framer-motion';
 import { createClient } from '@supabase/supabase-js';
 import { useCartStore } from '@/app/store/cartStore';
 import MobileMenu from '../../MobileMenu';
-import { fbEvent } from '@/lib/fbpixel'; // <-- 1. Import Meta Pixel helper
+import { fbEvent } from '../../../lib/fbpixel'; // <-- 1. Import Meta Pixel helper
 
 // Dynamically pull from your .env.local file
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
@@ -376,13 +376,13 @@ export default function ProductPage() {
 
     // 3. Fire AddToCart event to Meta Pixel
     fbEvent('AddToCart', {
-      content_ids: [product.id],
-      content_name: product.name,
-      content_type: 'product',
-      contents: [{ id: product.id, quantity: quantity }],
-      value: Number(product.price) * quantity,
-      currency: 'BDT',
-    });
+  content_ids: [product.id],
+  content_name: product.name,
+  content_type: 'product',
+  contents: [{ id: product.id, quantity: quantity }],
+  value: Number(product.price) * quantity,
+  currency: 'BDT',
+});
 
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 2000);

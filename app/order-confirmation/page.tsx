@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import MobileMenu from '../MobileMenu';
-import { fbEvent } from '@/lib/fbpixel'; // <-- 1. Import Meta Pixel helper
+import { fbEvent } from '../../lib/fbpixel'; // <-- 1. Import Meta Pixel helper
 
 export default function OrderConfirmationPage() {
   const [scrolled, setScrolled] = useState(false);

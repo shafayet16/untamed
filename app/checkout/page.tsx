@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import MobileMenu from '../MobileMenu';
 import { useCartStore } from '@/app/store/cartStore';
-import { fbEvent } from '@/lib/fbpixel'; // <-- 1. Import Meta Pixel helper
+import { fbEvent } from '../../lib/fbpixel'; // <-- 1. Import Meta Pixel helper
 
 const R2_PUBLIC_URL = (
   process.env.NEXT_PUBLIC_R2_PUBLIC_URL || 'https://pub-fab4e79b5407486695278c53c8ded542.r2.dev'
