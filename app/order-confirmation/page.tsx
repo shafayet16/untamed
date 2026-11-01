@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import MobileMenu from '../MobileMenu';
-import { fbEvent } from '../../lib/fbpixel'; // <-- 1. Import Meta Pixel helper
+import { fbEvent } from '../../lib/fbpixel';
 
 export default function OrderConfirmationPage() {
   const [scrolled, setScrolled] = useState(false);
@@ -18,33 +18,37 @@ export default function OrderConfirmationPage() {
       try {
         const parsed = JSON.parse(lastOrderRaw);
         setOrder(parsed);
-        localStorage.removeItem('lastOrder');
 
-        // 2. Fire Purchase event using fbEvent helper with deduplication check
-        const orderId = parsed.id || parsed.orderNumber;
-        if (orderId) {
-          const key = `fb_purchase_${orderId}`;
-          if (!localStorage.getItem(key)) {
-            fbEvent(
-              'Purchase',
-              {
-                content_ids: parsed.items?.map((i: any) => String(i.product_id || i.id)) || [],
-                contents: parsed.items?.map((i: any) => ({
-                  id: String(i.product_id || i.id),
-                  quantity: i.quantity,
-                })) || [],
-                content_type: 'product',
-                num_items: parsed.items?.reduce((sum: number, i: any) => sum + i.quantity, 0) || 1,
-                value: Number(parsed.total),
-                currency: 'BDT',
-              },
-              `purchase_${orderId}` // eventID for Conversions API deduplication
-            );
-            localStorage.setItem(key, '1'); // blocks duplicate fires on refresh
-          }
+        // Safely extract order ID and define tracking key first
+        const orderId = parsed.id || parsed.orderNumber || parsed.order_id;
+        const key = `fb_purchase_tracked_${orderId}`;
+
+        if (orderId && !localStorage.getItem(key)) {
+          const contentItems = (parsed.items || []).map((i: any) => ({
+            id: String(i.product_id || i.id || ''),
+            quantity: Number(i.quantity || 1),
+          }));
+
+          fbEvent(
+            'Purchase',
+            {
+              content_ids: contentItems.map((i: any) => i.id),
+              contents: contentItems,
+              content_type: 'product',
+              num_items: contentItems.reduce((sum: number, i: any) => sum + i.quantity, 0),
+              value: Number(parsed.total || 0),
+              currency: 'BDT',
+            },
+            `purchase_${orderId}`
+          );
+
+          localStorage.setItem(key, 'true');
         }
+
+        // Clean up lastOrder after event trigger
+        localStorage.removeItem('lastOrder');
       } catch (e) {
-        console.error('Could not parse last order', e);
+        console.error('Could not process purchase event:', e);
       }
     }
 
